@@ -6,9 +6,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,8 +25,10 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,8 +36,15 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.baoyz.swipemenulistview.SwipeMenuAdapter;
+
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -48,20 +63,29 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
     private String place;
     private Activity activity;
     private boolean pressed;
+    private float historicX = Float.NaN, historicY = Float.NaN;
+    private static final int DELTA = 50;
 
+    private ArrayAdapter<String> mAdapter;
+    private SwipeMenuListView myListView;
+
+
+    private enum Direction {LEFT, RIGHT;}
+
+    private String placename;
     private OnFragmentInteractionListener mListener;
 
     /**
      * The fragment's ListView/GridView.
      */
-    private AbsListView mListView;
+    //private AbsListView mListView;
 
     /**
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
 
-    private ListAdapter myAdapter;
+    //private ListAdapter myAdapter;
     private FloatingActionButton fab;
 
     public static ItemFragment newInstance() {
@@ -82,26 +106,21 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
         super.onCreate(savedInstanceState);
 
 
-
-
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        placeList = new ArrayList<String>();
         View view = inflater.inflate(R.layout.fragment_item, container, false);
 
         SharedPreferences pref = this.getActivity().getSharedPreferences("placelist", 0);
         placeList = loadFromStorage();
 
-
-
+/*
         resultText = (TextView) view.findViewById(R.id.result);
 
-        emptyText = (TextView)view.findViewById(android.R.id.empty);
-
-
+        emptyText = (TextView) view.findViewById(android.R.id.empty);
 
 
         myAdapter = new ArrayAdapter<String>(getActivity(), R.layout.placelist_layout, placeList);
@@ -112,9 +131,7 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
-
-
-
+*/
 
         fab = (FloatingActionButton) view.findViewById(R.id.fabBtn);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -129,8 +146,153 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
             }
         });
 
+
+
+
+        /*
+        ListView lvSimple = (ListView) view.findViewById(android.R.id.list);
+
+        lvSimple.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // TODO Auto-generated method stub
+                System.out.println("in touch");
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        historicX = event.getX();
+                        historicY = event.getY();
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        if (event.getX() - historicX < -DELTA)
+                        {
+                            FunctionDeleteRowWhenSlidingLeft();
+                            return true;
+                        }else if (event.getX() - historicX > DELTA) {
+                            FunctionDeleteRowWhenSlidingRight();
+                            return true;
+                        }
+                        break;
+                    default:
+                        return false;
+                }
+                return false;
+            }
+        });*/
+
+        //mAppList = activity.getPackageManager().getInstalledApplications(0);
+        myListView = new SwipeMenuListView(activity);
+        myListView = (SwipeMenuListView)view.findViewById(R.id.listView1);
+        Log.d(activity.getPackageName(), myListView != null ? "myListView is not null!" : "MyListView is null!");
+        mAdapter = new ArrayAdapter<String>(this.getActivity(), R.layout.placelist_layout, R.id.placelistlayout, placeList);
+        myListView.setAdapter(mAdapter);
+
+        // step 1. create a MenuCreator
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+            @Override
+            public void create(SwipeMenu menu) {
+
+                // create "delete" item
+                SwipeMenuItem deleteItem = new SwipeMenuItem(
+                        activity.getApplicationContext());
+                // set item background
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+                        0x3F, 0x25)));
+                // set item width
+                deleteItem.setWidth(dp2px(90));
+                // set a icon
+                deleteItem.setIcon(android.R.drawable.ic_menu_delete);
+                // add to menu
+                menu.addMenuItem(deleteItem);
+            }
+        };
+        // set creator
+        myListView.setMenuCreator(creator);
+
+        // step 2. listener item click event
+        myListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+
+
+//					delete(item);
+                if(!placeList.isEmpty())placeList.remove(position);
+                mAdapter.notifyDataSetChanged();
+
+                return false;
+            }
+        });
+
+        // set SwipeListener
+        myListView.setOnSwipeListener(new SwipeMenuListView.OnSwipeListener() {
+
+            @Override
+            public void onSwipeStart(int position) {
+                // swipe start
+            }
+
+            @Override
+            public void onSwipeEnd(int position) {
+                // swipe end
+            }
+        });
+
+
+        // test item long click
+        myListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                           int position, long id) {
+                Toast.makeText(activity.getApplicationContext(), position + " long click", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
+
+
+
         return view;
     }
+    private void delete(ApplicationInfo item) {
+        // delete app
+        try {
+            Intent intent = new Intent(Intent.ACTION_DELETE);
+            Bundle bundle = intent.getExtras();
+            String placename = bundle.getString("place");
+            placeList.remove(placename);
+        } catch (Exception e) {
+        }
+    }
+
+
+
+    private int dp2px(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                getResources().getDisplayMetrics());
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_left) {
+            myListView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+            return true;
+        }
+        if (id == R.id.action_right) {
+            myListView.setSwipeDirection(SwipeMenuListView.DIRECTION_RIGHT);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -146,12 +308,12 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         SharedPreferences pref = this.getActivity().getSharedPreferences("placelist", 0);
         SharedPreferences.Editor editor = pref.edit();
 
-        Set<String> set= new HashSet<String>();
+        Set<String> set = new HashSet<String>();
         for (int i = 0; i < placeList.size(); i++) {
             set.add(placeList.get(i).toString());
         }
@@ -170,39 +332,44 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
     }
 
 
-
     /**
      * The default content for this Fragment has a TextView that is shown when
      * the list is empty. If you would like to change the text, call this method
      * to supply the text it should use.
      */
-    public void setEmptyText(CharSequence emptyText) {
+   /* public void setEmptyText(CharSequence emptyText) {
         View emptyView = mListView.getEmptyView();
 
         if (emptyView instanceof TextView) {
             ((TextView) emptyView).setText(emptyText);
         }
 
-    }
+    }*/
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-            inflater.inflate(R.menu.menu_main, menu);
-            if(pressed) {
-                menu.findItem(R.id.recyclebin).setVisible(true);
-                pressed = false;
-            }
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-      pressed = true;
-
         Intent intent = new Intent(activity, PlaceViewActivity.class);
-        String name = myAdapter.getItem(position).toString();
+        String name = mAdapter.getItem(position).toString();
+        placename = name;
         intent.putExtra("place", name);
         startActivity(intent);
+    }
+    public void FunctionDeleteRowWhenSlidingLeft(){
+
+    }
+
+    public void FunctionDeleteRowWhenSlidingRight() {
+
+        if (!placeList.isEmpty()) {
+            System.out.println("in delete");
+            placeList.remove(placename);
+        }
     }
 
     /**
@@ -229,8 +396,6 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
         alertDialogBuilder.setView(promptView);
 
 
-
-
         final EditText editText = (EditText) promptView.findViewById(R.id.edittext);
         // setup a dialog window
         alertDialogBuilder.setCancelable(false)
@@ -250,7 +415,6 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
                         });
 
 
-
         // create an alert dialog
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
@@ -262,7 +426,7 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
         ArrayList<String> items = new ArrayList<String>();
 
         Set<String> set = prefs.getStringSet("placelist", null);
-        if(set != null && !set.isEmpty()) {
+        if (set != null && !set.isEmpty()) {
             for (String s : set) {
                 try {
                     String string = s;
@@ -276,7 +440,6 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
 
         return items;
     }
-
 
 
 }
