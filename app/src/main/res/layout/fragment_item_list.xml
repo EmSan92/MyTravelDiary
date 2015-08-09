@@ -10,7 +10,8 @@
     <com.baoyz.swipemenulistview.SwipeMenuListView
         android:id="@+id/listView1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:listSelector="@drawable/list_selector">
 
 </com.baoyz.swipemenulistview.SwipeMenuListView>
 

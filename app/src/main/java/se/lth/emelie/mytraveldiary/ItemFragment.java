@@ -56,15 +56,10 @@ import java.util.Set;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ItemFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class ItemFragment extends Fragment {
     private ArrayList<String> placeList;
-    private TextView resultText;
-    private TextView emptyText;
-    private String place;
+
     private Activity activity;
-    private boolean pressed;
-    private float historicX = Float.NaN, historicY = Float.NaN;
-    private static final int DELTA = 50;
 
     private ArrayAdapter<String> mAdapter;
     private SwipeMenuListView myListView;
@@ -101,6 +96,7 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
     public ItemFragment() {
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,21 +113,7 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
         SharedPreferences pref = this.getActivity().getSharedPreferences("placelist", 0);
         placeList = loadFromStorage();
 
-/*
-        resultText = (TextView) view.findViewById(R.id.result);
 
-        emptyText = (TextView) view.findViewById(android.R.id.empty);
-
-
-        myAdapter = new ArrayAdapter<String>(getActivity(), R.layout.placelist_layout, placeList);
-
-        // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(myAdapter);
-
-        // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
-*/
 
         fab = (FloatingActionButton) view.findViewById(R.id.fabBtn);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -141,52 +123,17 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
                 showInputDialog();
 
 
-                //myAdapter.notifyDataSetChanged();
-
             }
         });
 
 
-
-
-        /*
-        ListView lvSimple = (ListView) view.findViewById(android.R.id.list);
-
-        lvSimple.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                System.out.println("in touch");
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        historicX = event.getX();
-                        historicY = event.getY();
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                        if (event.getX() - historicX < -DELTA)
-                        {
-                            FunctionDeleteRowWhenSlidingLeft();
-                            return true;
-                        }else if (event.getX() - historicX > DELTA) {
-                            FunctionDeleteRowWhenSlidingRight();
-                            return true;
-                        }
-                        break;
-                    default:
-                        return false;
-                }
-                return false;
-            }
-        });*/
-
-        //mAppList = activity.getPackageManager().getInstalledApplications(0);
         myListView = new SwipeMenuListView(activity);
         myListView = (SwipeMenuListView)view.findViewById(R.id.listView1);
         Log.d(activity.getPackageName(), myListView != null ? "myListView is not null!" : "MyListView is null!");
         mAdapter = new ArrayAdapter<String>(this.getActivity(), R.layout.placelist_layout, R.id.placelistlayout, placeList);
         myListView.setAdapter(mAdapter);
+
+
 
         // step 1. create a MenuCreator
         SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -216,12 +163,19 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
 
-
-//					delete(item);
                 if(!placeList.isEmpty())placeList.remove(position);
                 mAdapter.notifyDataSetChanged();
 
                 return false;
+            }
+        });
+
+        myListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> a, View v, int i, long l) {
+                Intent intent1 = new Intent(getActivity(), PlaceViewActivity.class);
+                intent1.putExtra("placename", placeList.get(i));
+                startActivity(intent1);
             }
         });
 
@@ -255,6 +209,10 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
 
 
         return view;
+
+
+
+
     }
     private void delete(ApplicationInfo item) {
         // delete app
@@ -332,19 +290,7 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
     }
 
 
-    /**
-     * The default content for this Fragment has a TextView that is shown when
-     * the list is empty. If you would like to change the text, call this method
-     * to supply the text it should use.
-     */
-   /* public void setEmptyText(CharSequence emptyText) {
-        View emptyView = mListView.getEmptyView();
 
-        if (emptyView instanceof TextView) {
-            ((TextView) emptyView).setText(emptyText);
-        }
-
-    }*/
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -352,25 +298,11 @@ public class ItemFragment extends Fragment implements AbsListView.OnItemClickLis
 
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent(activity, PlaceViewActivity.class);
-        String name = mAdapter.getItem(position).toString();
-        placename = name;
-        intent.putExtra("place", name);
-        startActivity(intent);
-    }
-    public void FunctionDeleteRowWhenSlidingLeft(){
 
-    }
 
-    public void FunctionDeleteRowWhenSlidingRight() {
 
-        if (!placeList.isEmpty()) {
-            System.out.println("in delete");
-            placeList.remove(placename);
-        }
-    }
+
+
 
     /**
      * This interface must be implemented by activities that contain this

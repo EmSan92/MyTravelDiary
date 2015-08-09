@@ -17,10 +17,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EditActivity"
-            android:label="@string/title_activity_edit" >
-        </activity>
-        <activity
             android:name=".PlaceViewActivity"
             android:label="@string/title_activity_place_view" >
         </activity>

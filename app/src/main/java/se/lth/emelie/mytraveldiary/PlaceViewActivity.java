@@ -26,10 +26,10 @@ public class PlaceViewActivity extends AppCompatActivity implements PlaceViewFra
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getFragmentManager().beginTransaction().add(R.id.fragmentPlaceViewContainer, PlaceViewFragment.newInstance()).commit();
 
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-        String placename = bundle.getString("place");
-        setTitle(placename);
+
+        String name = getIntent().getStringExtra("placename");
+        System.out.println("name of place is : " +name);
+        setTitle(name);
 
 
 

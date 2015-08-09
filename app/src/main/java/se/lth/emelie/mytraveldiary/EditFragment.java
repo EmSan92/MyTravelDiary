@@ -1,41 +1,34 @@
 package se.lth.emelie.mytraveldiary;
 
 import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
-
-import com.baoyz.swipemenulistview.SwipeMenuListView;
-
-import java.util.ArrayList;
 
 
-public class PlaceViewFragment extends Fragment {
-
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link EditFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link EditFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class EditFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private ArrayAdapter<String> vAdapter;
-    private ListView vListView;
-    private FloatingActionButton fab2;
 
-    public static PlaceViewFragment newInstance() {
-        PlaceViewFragment fragment = new PlaceViewFragment();
+
+    public static EditFragment newInstance() {
+        EditFragment fragment = new EditFragment();
 
         return fragment;
     }
 
-    public PlaceViewFragment() {
+    public EditFragment() {
         // Required empty public constructor
     }
 
@@ -48,21 +41,8 @@ public class PlaceViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_place_view, container, false);
-
-
-        fab2 = (FloatingActionButton) view.findViewById(R.id.fabBtn2);
-        fab2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println("work");
-                Toast.makeText(v.getContext(), "text", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-
-        return view;
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.edit_fragment, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
