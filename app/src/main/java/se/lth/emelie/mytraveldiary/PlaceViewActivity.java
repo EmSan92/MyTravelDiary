@@ -15,7 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class PlaceViewActivity extends AppCompatActivity implements PlaceViewFragment.OnFragmentInteractionListener{
+public class PlaceViewActivity extends AppCompatActivity implements PlaceViewFragment.OnFragmentInteractionListener, EditFragment.OnFragmentInteractionListener{
 
 
     @Override

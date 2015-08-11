@@ -3,7 +3,9 @@ package se.lth.emelie.mytraveldiary;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -13,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -25,8 +28,8 @@ public class PlaceViewFragment extends Fragment {
 
 
     private OnFragmentInteractionListener mListener;
-    private ArrayAdapter<String> vAdapter;
-    private ListView vListView;
+    private MyAdapter myAdapter;
+    private ArrayList<ContentItem> contentList;
     private FloatingActionButton fab2;
 
     public static PlaceViewFragment newInstance() {
@@ -49,6 +52,20 @@ public class PlaceViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_place_view, container, false);
+        contentList = new ArrayList<ContentItem>();
+
+
+
+        ContentItem con = new ContentItem("2015-08-09","Forbidden City");
+        contentList.add(con);
+
+        ListView listView = (ListView) view.findViewById(R.id.listView2);
+
+// get data from the table by the ListAdapter
+        myAdapter = new MyAdapter(this.getActivity(), R.layout.view_layout, contentList);
+
+        listView.setAdapter(myAdapter);
+
 
 
         fab2 = (FloatingActionButton) view.findViewById(R.id.fabBtn2);
@@ -57,7 +74,9 @@ public class PlaceViewFragment extends Fragment {
             public void onClick(View v) {
                 System.out.println("work");
                 Toast.makeText(v.getContext(), "text", Toast.LENGTH_SHORT).show();
-
+                final FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.fragmentPlaceViewContainer, new EditFragment(), "NewFragmentTag");
+                ft.commit();
             }
         });
 
