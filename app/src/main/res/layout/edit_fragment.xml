@@ -1,7 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="se.lth.emelie.mytraveldiary.EditFragment"
-    android:id="@+id/fragmentedit">
+    android:id="@+id/fragmentedit"
+    android:background="@drawable/back">
 <ScrollView
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -11,6 +12,32 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="#fff">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:orientation="horizontal"
+            android:background="#535362">
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/date"
+                android:textColor="#000"
+                android:padding="10dp"
+                android:layout_gravity="left"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/cap"
+                android:textColor="#000"
+                android:padding="10dp"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+
         <ImageView
             android:layout_width="400dp"
             android:layout_height="400dp"
@@ -65,37 +92,56 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="bottom"
+        android:layout_gravity="bottom|center"
         android:padding="10dp"
-        android:background="#673AB7">
-
+        android:background="#668999">
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </View>
         <Button
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginRight="30dp"
             android:id="@+id/camera"
             android:background="@drawable/camera"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </View>
         <Button
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginRight="30dp"
             android:id="@+id/gallery"
             android:background="@drawable/image"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </View>
         <Button
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginRight="30dp"
-            android:id="@+id/edit"
+            android:id="@+id/write"
             android:background="@drawable/create"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </View>
 
         <Button
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginRight="30dp"
             android:id="@+id/save"
             android:background="@drawable/check"/>
 
-
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </View>
 
     </LinearLayout>
 

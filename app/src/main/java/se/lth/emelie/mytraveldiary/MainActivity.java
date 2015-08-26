@@ -1,11 +1,16 @@
 package se.lth.emelie.mytraveldiary;
 
+import android.app.ActionBar;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.TypefaceSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -18,6 +23,8 @@ public class MainActivity extends ActionBarActivity implements ItemFragment.OnFr
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getFragmentManager().beginTransaction().add(R.id.fragmentContainer, ItemFragment.newInstance()).commit();
+
+
     }
 
     @Override

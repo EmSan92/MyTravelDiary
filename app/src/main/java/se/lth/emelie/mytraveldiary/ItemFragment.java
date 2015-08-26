@@ -335,8 +335,7 @@ public class ItemFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int id) {
                         placeList.add(editText.getText().toString());
 
-                        System.out.println(placeList.get(placeList.indexOf(editText.getText().toString())).toString());
-                        //resultText.setText("Hello, " + editText.getText());
+
                     }
                 })
                 .setNegativeButton("Cancel",
