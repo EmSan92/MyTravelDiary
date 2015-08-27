@@ -1,6 +1,8 @@
 package se.lth.emelie.mytraveldiary;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -51,9 +57,7 @@ public class MyAdapter extends BaseAdapter {
         ViewHolder holder;
 
         if (v == null) {
-            /*LayoutInflater vi;
-            vi = LayoutInflater.from(context);
-            v = vi.inflate(R.layout.view_layout, null);*/
+
             v = mInflater.inflate(R.layout.view_layout, parent, false);
             holder = new ViewHolder();
             holder.date = (TextView) v.findViewById(R.id.dateview);
@@ -66,6 +70,9 @@ public class MyAdapter extends BaseAdapter {
             holder.im3 = (ImageView) v.findViewById(R.id.image3);
 
             v.setTag(holder);
+
+
+
         } else {
             v = convertView;
             holder = (ViewHolder) v.getTag();
@@ -73,17 +80,7 @@ public class MyAdapter extends BaseAdapter {
 
         ContentItem p = getItem(position);
 
-        /*if (p != null) {
-            TextView date = (TextView) v.findViewById(R.id.dateview);
-            TextView cap = (TextView) v.findViewById(R.id.caption);
-            TextView tt1 = (TextView) v.findViewById(R.id.textview1);
-            TextView tt2 = (TextView) v.findViewById(R.id.textview2);
-            TextView tt3 = (TextView) v.findViewById(R.id.textview3);
 
-            ImageView im1 = (ImageView) v.findViewById(R.id.image1);
-            ImageView im2 = (ImageView) v.findViewById(R.id.image2);
-            ImageView im3 = (ImageView) v.findViewById(R.id.image3);
-*/
 
         holder.date.setText(p.getDate());
         holder.cap.setText(p.getCaption());
@@ -102,13 +99,13 @@ public class MyAdapter extends BaseAdapter {
         }
 
         if (p.getImages().size() > 0) {
-            holder.im1.setImageBitmap(p.getImages().get(0));
+            holder.im1.setImageBitmap(loadImageFromStorage(p.getImages().get(0)));
             holder.im1.setVisibility(View.VISIBLE);
 
-            holder.im2.setImageBitmap(p.getImages().get(1));
+            holder.im2.setImageBitmap(loadImageFromStorage(p.getImages().get(1)));
             holder.im2.setVisibility(View.VISIBLE);
 
-            holder.im3.setImageBitmap(p.getImages().get(2));
+            holder.im3.setImageBitmap(loadImageFromStorage(p.getImages().get(2)));
             holder.im3.setVisibility(View.VISIBLE);
         }
 
@@ -120,6 +117,20 @@ public class MyAdapter extends BaseAdapter {
         public ImageView im1, im2, im3;
         public TextView date, cap, tt1, tt2, tt3;
     }
+
+    private Bitmap loadImageFromStorage(String path) {
+        Bitmap b = null;
+        try {
+            File f = new File(path, "image.jpg");
+            b = BitmapFactory.decodeStream(new FileInputStream(f));
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return b;
+    }
+
 }
 
 

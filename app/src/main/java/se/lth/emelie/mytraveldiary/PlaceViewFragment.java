@@ -1,5 +1,6 @@
 package se.lth.emelie.mytraveldiary;
 
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
@@ -15,10 +16,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,27 +34,32 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
 public class PlaceViewFragment extends Fragment {
 
-/**
- * Att GÖRA!!:
- * Spara inlägg, dvs spara alla bilder och text till varje inlägg.
- * Kunna ladda in alla inlägg med rätt bilder och text.
- * Fixa så att vid fler bilder än en i ett inlägg så ska inte bara den sista tilllagda bilden visas flera gånger.
- * Fixa så man kan fylla i datum och caption.
- * Fixa små buggar, text vad som händer om man inte fyllt i nån text mm...
- * Ev fixa popupp rutor, tex vid edit mode om man inte fyllt i nått.
- **/
+    /**
+     * Att GÖRA!!:
+     * Spara inlägg, dvs spara alla bilder och text till varje inlägg.
+     * Kunna ladda in alla inlägg med rätt bilder och text.
+     * Fixa så att vid fler bilder än en i ett inlägg så ska inte bara den sista tilllagda bilden visas flera gånger.
+     * Fixa så man kan fylla i datum och caption.
+     * Fixa små buggar, text vad som händer om man inte fyllt i nån text mm...
+     * Ev fixa popupp rutor, tex vid edit mode om man inte fyllt i nått.
+     **/
 
 
     private OnFragmentInteractionListener mListener;
@@ -54,6 +67,10 @@ public class PlaceViewFragment extends Fragment {
     private ArrayList<ContentItem> contentList;
     private FloatingActionButton fab2;
     private String date, capture;
+    private Activity activity;
+    private String desination;
+    private Button deletePost;
+    private ListView listView;
 
     private ArrayList<String> pathList;
 
@@ -77,62 +94,106 @@ public class PlaceViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_place_view, container, false);
-        contentList = new ArrayList<ContentItem>();
-        pathList = new ArrayList<String>();
-        pathList = loadFromStorage();
+        activity = this.getActivity();
 
+        desination = getArguments().getString("destination");
 
+        /**
+         *Load contentItems using Json.
+         **/
+        SharedPreferences prefs = activity.getSharedPreferences(desination, 0);
 /*
-        ContentItem con = new ContentItem("2015-map-09","Forbidden City",null,null,null,null,null,null);
-        con.setText("Hejlalalalala");
-        con.setText("Hejlalalalala");
-        con.setText("Hejlalalalala");
-        for (int i =0;i<pathList.size();i++){
-            if(!pathList.isEmpty()) {
-                con.setImage1(loadImageFromStorage(pathList.get(0)));
-            }
-        }*/
-        //Bitmap b = loadImageFromStorage(pathList.get(0));
-        //contentList.add(con);
+        SharedPreferences.Editor prefsEditor = prefs.edit();
+        prefsEditor.clear();
+        prefsEditor.commit();
+*/
 
-        ListView listView = (ListView) view.findViewById(R.id.listView2);
+        Gson gson = new Gson();
+        String json = prefs.getString(desination, null);
 
-// get data from the table by the ListAdapter
+        Map<String, ?> keys = prefs.getAll();
+
+        for (Map.Entry<String, ?> entry : keys.entrySet()) {
+            Log.d("map values", entry.getKey() + ": " +
+                    entry.getValue().toString());
+        }
+
+        Type type = new TypeToken<ArrayList<ContentItem>>() {
+        }.getType();
+        contentList = gson.fromJson(json, type);
+        // Log.d("Contentlist 1", contentList.get(0).getImages().get(0).toString());
+        if (contentList == null) {
+            contentList = new ArrayList<ContentItem>();
+        }
 
 
-        listView.setAdapter(myAdapter);
+        listView = (ListView) view.findViewById(R.id.listView2);
+
+        // get data from the table by the ListAdapter
         myAdapter = new MyAdapter(this.getActivity(), R.layout.view_layout, contentList);
-        //ContentItem con =  new ContentItem("hej",null,null,null,null,null,null,null);
+        listView.setAdapter(myAdapter);
 
+
+
+        /**
+         *When click on the floating action button, this code will change fragment to editfragment.
+         *
+         **/
         fab2 = (FloatingActionButton) view.findViewById(R.id.fabBtn2);
-        final EditFragment frag = new EditFragment();
-        frag.setPlaceViewFragment(this);
+        final EditFragment editfrag = new EditFragment();
+        editfrag.setPlaceViewFragment(this);
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.replace(R.id.fragmentContainer, editfrag, "tag");
+                Bundle args = new Bundle();
+                args.putString("destination", desination);
+                editfrag.setArguments(args);
+                fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                fragmentTransaction.commit();
 
-                //contentList.add(new ContentItem(date, capture));
-                final FragmentTransaction ft = getFragmentManager().beginTransaction();
-
-                ft.replace(R.id.fragmentPlaceViewContainer, frag, "NewFragmentTag");
-                ft.commit();
             }
         });
 
+/**
+ *Remove a contentitem from the contentList.
+ * Does not work!!!!!!!!!!!!!!!
+ **/
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-        SharedPreferences pref = this.getActivity().getSharedPreferences("placelist", 0);
-        pathList = loadFromStorage();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                contentList.remove(position);
+
+                myAdapter.notifyDataSetChanged();
+
+            }
+        });
 
 
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+
+    /**
+     * Change the Title to the destination
+     **/
+    public void onResume() {
+        super.onResume();
+
+        // Set title bar
+        ((MainActivity) getActivity()).setActionBarTitle(desination);
+
+    }
+
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
     }
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -152,67 +213,53 @@ public class PlaceViewFragment extends Fragment {
     }
 
     /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+     * Save all contentitems in the contentlist.
+     **/
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        SharedPreferences prefs = activity.getSharedPreferences(desination, 0);
+
+        SharedPreferences.Editor prefsEditor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(contentList);
+
+        prefsEditor.putString(desination, json);
+
+        prefsEditor.commit();
+    }
+
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
 
-    private Bitmap loadImageFromStorage(String path) {
-        Bitmap b = null;
-        try {
-            File f = new File(path, "image.jpg");
-            b = BitmapFactory.decodeStream(new FileInputStream(f));
-            //ImageView img=(ImageView)this.getActivity().findViewById(R.id.imgPicker);
-            // img.setImageBitmap(b);
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return b;
-    }
-
-
-    public ArrayList<String> loadFromStorage() {
-        SharedPreferences prefs = this.getActivity().getSharedPreferences("pathlist", 0);
-
-        ArrayList<String> items = new ArrayList<String>();
-
-        Set<String> set = prefs.getStringSet("pathlist", null);
-        if (set != null && !set.isEmpty()) {
-            for (String s : set) {
-                try {
-                    String string = s;
-                    items.add(string);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return items;
-    }
-
+    /**
+     * Gets a contentItem from the EditFragment and adds it to a contentList.
+     * The contentList is saved to sharedpreferences using Gson and Json.
+     **/
     public void addNewContent(ContentItem contentItem) {
         contentList.add(contentItem);
         System.out.println("Storlek på contentlist: " + contentList.size());
         myAdapter.notifyDataSetChanged();
 
+        SharedPreferences prefs = activity.getSharedPreferences(desination, 0);
+
+        SharedPreferences.Editor prefsEditor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(contentList);
+
+        prefsEditor.putString(desination, json);
+
+        prefsEditor.commit();
+
     }
 
 
-
-
-    }
+}
 
 
 

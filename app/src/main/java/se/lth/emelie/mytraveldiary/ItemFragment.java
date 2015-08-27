@@ -2,6 +2,7 @@ package se.lth.emelie.mytraveldiary;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -41,10 +43,14 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.baoyz.swipemenulistview.SwipeMenuAdapter;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -66,8 +72,8 @@ public class ItemFragment extends Fragment {
 
 
     private enum Direction {LEFT, RIGHT;}
-
-    private String placename;
+    private ArrayList<ContentItem> contentList;
+    private String destination;
     private OnFragmentInteractionListener mListener;
 
     /**
@@ -80,7 +86,7 @@ public class ItemFragment extends Fragment {
      * Views.
      */
 
-    //private ListAdapter myAdapter;
+
     private FloatingActionButton fab;
 
     public static ItemFragment newInstance() {
@@ -110,11 +116,17 @@ public class ItemFragment extends Fragment {
         placeList = new ArrayList<String>();
         View view = inflater.inflate(R.layout.fragment_item, container, false);
 
+        /**
+         *Load all destinations and place it in placeList.
+         **/
         SharedPreferences pref = this.getActivity().getSharedPreferences("placelist", 0);
         placeList = loadFromStorage();
+        contentList = new ArrayList<ContentItem>();
 
 
-
+        /**
+         * Make floating button clickable, and when pressed a dialog is showing.
+         **/
         fab = (FloatingActionButton) view.findViewById(R.id.fabBtn);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,18 +138,22 @@ public class ItemFragment extends Fragment {
             }
         });
 
-
+        /**
+         *Assign the Adapter the right layout to show in listView.
+         **/
         myListView = new SwipeMenuListView(activity);
-        myListView = (SwipeMenuListView)view.findViewById(R.id.listView1);
-        Log.d(activity.getPackageName(), myListView != null ? "myListView is not null!" : "MyListView is null!");
+        myListView = (SwipeMenuListView) view.findViewById(R.id.listView1);
+       // Log.d(activity.getPackageName(), myListView != null ? "myListView is not null!" : "MyListView is null!");
         mAdapter = new ArrayAdapter<String>(this.getActivity(), R.layout.placelist_layout, R.id.placelistlayout, placeList);
         myListView.setAdapter(mAdapter);
-
 
 
         // step 1. create a MenuCreator
         SwipeMenuCreator creator = new SwipeMenuCreator() {
 
+            /**
+             *Create the delete view when listitem is swiped to the left
+             **/
             @Override
             public void create(SwipeMenu menu) {
 
@@ -158,24 +174,38 @@ public class ItemFragment extends Fragment {
         // set creator
         myListView.setMenuCreator(creator);
 
-        // step 2. listener item click event
+        /**
+         *Delete the listItem when the delete view is clicked
+         **/
         myListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
 
-                if(!placeList.isEmpty())placeList.remove(position);
+                if (!placeList.isEmpty()) placeList.remove(position);
                 mAdapter.notifyDataSetChanged();
 
                 return false;
             }
         });
 
+        /**
+         *When an listitem is clicked, change fragment to placeviewfragment.
+         **/
         myListView.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> a, View v, int i, long l) {
-                Intent intent1 = new Intent(getActivity(), PlaceViewActivity.class);
-                intent1.putExtra("placename", placeList.get(i));
-                startActivity(intent1);
+                final Fragment placeviewfrag = new PlaceViewFragment();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                Bundle args = new Bundle();
+                args.putString("destination", placeList.get(i));
+                placeviewfrag.setArguments(args);
+                fragmentTransaction.replace(R.id.fragmentContainer, placeviewfrag, "tag");
+                fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                fragmentTransaction.addToBackStack(null);
+
+                fragmentTransaction.commit();
+
+
             }
         });
 
@@ -194,28 +224,26 @@ public class ItemFragment extends Fragment {
         });
 
 
-        // test item long click
-        myListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                           int position, long id) {
-                Toast.makeText(activity.getApplicationContext(), position + " long click", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-
-
-
-
         return view;
 
 
+    }
+    /**
+     *Sets the correct title
+     **/
+    public void onResume(){
+        super.onResume();
 
+        // Set title bar
+        ((MainActivity) getActivity()).setActionBarTitle("My Travel Diary");
 
     }
+
+
+    /**
+     *Delete the listitem if the deleteview was clicked
+     **/
     private void delete(ApplicationInfo item) {
-        // delete app
         try {
             Intent intent = new Intent(Intent.ACTION_DELETE);
             Bundle bundle = intent.getExtras();
@@ -226,14 +254,14 @@ public class ItemFragment extends Fragment {
     }
 
 
-
     private int dp2px(int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getResources().getDisplayMetrics());
     }
 
-
-
+    /**
+     *Decide in which direction the swipe occured.
+     **/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -251,7 +279,6 @@ public class ItemFragment extends Fragment {
     }
 
 
-
     @Override
     public void onAttach(Activity activity) {
 
@@ -264,7 +291,9 @@ public class ItemFragment extends Fragment {
         }
         this.activity = activity;
     }
-
+    /**
+     *Saves all destinations in a list.
+     **/
     @Override
     public void onPause() {
         super.onPause();
@@ -290,8 +319,6 @@ public class ItemFragment extends Fragment {
     }
 
 
-
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
@@ -299,26 +326,14 @@ public class ItemFragment extends Fragment {
     }
 
 
-
-
-
-
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
     }
 
+    /**
+     *Shows a dialog where a new destination listItem can be created by adding the name of the desitnation and press OK.
+     **/
     protected void showInputDialog() {
 
         // get prompts.xml view
@@ -351,6 +366,9 @@ public class ItemFragment extends Fragment {
         alert.show();
     }
 
+    /**
+     *Load all destinations and place them in a list
+     **/
     public ArrayList<String> loadFromStorage() {
         SharedPreferences prefs = activity.getSharedPreferences("placelist", 0);
 
@@ -371,6 +389,7 @@ public class ItemFragment extends Fragment {
 
         return items;
     }
+
 
 
 }

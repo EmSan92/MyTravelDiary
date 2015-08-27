@@ -1,13 +1,9 @@
 <resources>
-    <string name="app_name">MyTravelDiary</string>
+    <string name="app_name">My Travel Diary</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
     <string name="title_activity_edit">EditActivity</string>
     <string name="name_of_place">Name of place</string>
     <string name="title_activity_place_view">PlaceViewActivity</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_splash">Splash</string>
+
 </resources>

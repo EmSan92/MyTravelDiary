@@ -13,14 +13,14 @@ import java.util.List;
  */
 public class ContentItem {
     private String date, caption, text1, text2, text3;
-    private Bitmap im1, im2, im3;
-    private ArrayList<Bitmap> imageList;
+    private String im1, im2, im3;
+    private ArrayList<String> imageList;
     private ArrayList<String> textList;
 
-    public ContentItem(String date, String caption, String text1, String text2, String text3, Bitmap im1, Bitmap im2, Bitmap im3) {
+    public ContentItem(String date, String caption, String text1, String text2, String text3, String im1, String im2, String im3) {
         this.date = date;
         this.caption = caption;
-        imageList = new ArrayList<Bitmap>(3);
+        imageList = new ArrayList<String>(3);
         textList = new ArrayList<String>(3);
         this.text1 = text1;
         this.text2 = text2;
@@ -50,20 +50,20 @@ public class ContentItem {
         return textList;
     }
 
-    public ArrayList<Bitmap> getImages() {
+    public ArrayList<String> getImages() {
         return imageList;
 
     }
 
-    public void setImage1(Bitmap image1) {
+    public void setImage1(String image1) {
         imageList.add(0, image1);
     }
 
-    public void setImage2(Bitmap image2) {
+    public void setImage2(String image2) {
         imageList.add(1, image2);
     }
 
-    public void setImage3(Bitmap image3) {
+    public void setImage3(String image3) {
         imageList.add(2, image3);
     }
 

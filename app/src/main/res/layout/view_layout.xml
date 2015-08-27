@@ -34,7 +34,7 @@
     android:orientation="vertical"
     android:background="#fff">
     <ImageView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:visibility="gone"
@@ -50,8 +50,9 @@
         android:padding="10dp"/>
 
     <ImageView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:visibility="gone"
         android:id="@+id/image2"
         android:padding="10dp"/>
@@ -64,8 +65,9 @@
         android:padding="10dp"/>
 
     <ImageView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:visibility="gone"
         android:id="@+id/image3"
         android:padding="10dp"/>
@@ -96,7 +98,8 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:paddingLeft="10dp"
-            android:background="@drawable/recbin"/>
+            android:background="@drawable/recbin"
+            android:id="@+id/deletepost"/>
 
 
     </LinearLayout>

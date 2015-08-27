@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,18 +34,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link EditFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link EditFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class EditFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
@@ -60,13 +57,15 @@ public class EditFragment extends Fragment {
     private static String imageFolderPath = null;
     private String imageName = null;
     private static Uri fileUri = null;
-    private ArrayList<String> pathList, textList;
+    private ArrayList<String> textList;
+    private Map<Integer, ArrayList<String>> pathList;
     private Button save, cameraButton, gallery, write;
     private PlaceViewFragment placeViewFragment;
     private EditText tt1, tt2, tt3;
     private TextView date, cap;
     private String dateString, capString;
-
+    private String destination;
+    private ArrayList<String> images;
 
     public static EditFragment newInstance() {
         EditFragment fragment = new EditFragment();
@@ -94,13 +93,15 @@ public class EditFragment extends Fragment {
                              Bundle savedInstanceState) {
         imList = new ArrayList<Bitmap>();
         content = new ContentItem(null, null, null, null, null, null, null, null);
-        pathList = new ArrayList<String>();
+        pathList = new HashMap<Integer, ArrayList<String>>();
+
         textList = new ArrayList<String>();
         counter = 0;
         textcounter = 0;
         dateString = null;
         capString = null;
-
+        destination = getArguments().getString("destination");
+        images = new ArrayList<String>();
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.edit_fragment, container, false);
@@ -116,6 +117,9 @@ public class EditFragment extends Fragment {
         im3 = (ImageView) view.findViewById(R.id.image3);
 
 
+        /**
+         *Open the camera sensor when camera button is pressed
+         **/
         cameraButton = (Button) view.findViewById(R.id.camera);
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,7 +135,7 @@ public class EditFragment extends Fragment {
             }
         });
 
-        SharedPreferences pref = this.getActivity().getSharedPreferences("pathlist", 0);
+       /* SharedPreferences pref = this.getActivity().getSharedPreferences("pathlist", 0);
         SharedPreferences.Editor editor = pref.edit();
 
         Set<String> set = new HashSet<String>();
@@ -140,26 +144,36 @@ public class EditFragment extends Fragment {
         }
         editor.putStringSet("pathlist", set);
         editor.commit();
-
-
+*/
+        /**
+         *Go back to placeviewfragment and showing all post.
+         * Sends a contentitem back to the addnewcontent methos in placeviewfragment
+         **/
         save = (Button) view.findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.fragmentPlaceViewContainer, placeViewFragment, "NewFragmentTag");
+                //final FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+                //ft.replace(R.id.fragmentContainer, placeViewFragment, "NewFragmentTag");
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.replace(R.id.fragmentContainer, placeViewFragment, "tag");
+                fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+
                 String t1 = null, t2 = null, t3 = null;
-                Bitmap b1 = null, b2 = null, b3 = null;
+                String b1 = null, b2 = null, b3 = null;
+
                 if (!pathList.isEmpty()) {
-                    if (pathList.size() < 2) {
-                        b1 = loadImageFromStorage(pathList.get(0));
-                    } else if (pathList.size() < 3) {
-                        b1 = loadImageFromStorage(pathList.get(0));
-                        b2 = loadImageFromStorage(pathList.get(1));
-                    } else if (pathList.size() > 2) {
-                        b1 = loadImageFromStorage(pathList.get(0));
-                        b2 = loadImageFromStorage(pathList.get(1));
-                        b3 = loadImageFromStorage(pathList.get(2));
+                    if (images.size() < 2) {
+                        b1 = pathList.get(0).get(0);
+                    } else if (images.size() < 3) {
+                        b1 =pathList.get(0).get(0);
+                        b2 =pathList.get(0).get(1);
+                    } else if (images.size() > 2) {
+                        b1 = pathList.get(0).get(0);
+                        b2 = pathList.get(0).get(1);
+                        b3 = pathList.get(0).get(2);
                     }
                     if (textList.size() == 1) {
                         t1 = textList.get(0);
@@ -171,17 +185,19 @@ public class EditFragment extends Fragment {
                         t2 = textList.get(1);
                         t3 = textList.get(2);
                     }
-                    placeViewFragment.addNewContent(new ContentItem("Date", "Cap", t1, t2, t3, b1, b2, b3));
+                    placeViewFragment.addNewContent(new ContentItem("Date", "Caption", t1, t2, t3, b1, b2, b3));
                 }
 
 
                 //placeViewFragment.addNewContent(content);
                 Toast.makeText(v.getContext(), "saved", Toast.LENGTH_SHORT).show();
 
-                ft.commit();
+                fragmentTransaction.commit();
             }
         });
-
+        /**
+         *Load images from the image gallery on the phone
+         **/
         gallery = (Button) view.findViewById(R.id.gallery);
         gallery.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,14 +207,16 @@ public class EditFragment extends Fragment {
                 startActivityForResult(i, RESULT_LOAD_IMAGE);
             }
         });
-
+        /**
+         *Open a dialog so user can put in text.
+         **/
         write = (Button) view.findViewById(R.id.write);
         write.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 showInputDialog();
-                Toast.makeText(v.getContext(), "work", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(v.getContext(), "work", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -231,16 +249,7 @@ public class EditFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
@@ -248,7 +257,9 @@ public class EditFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+        /**
+         *Gets the images taken with the camera, and depended on how many pictures were taken they are saved in pathlist
+         **/
         if (requestCode == CAMERA_REQUEST && resultCode == this.getActivity().RESULT_OK && counter <= 2) {
             Bitmap bmp = (Bitmap) data.getExtras().get("data");
 
@@ -258,27 +269,35 @@ public class EditFragment extends Fragment {
                     im1.setVisibility(View.VISIBLE);
                     im1.setImageBitmap(bmp);
                     Log.d(this.getActivity().getPackageName(), bmp != null ? "bmp is not null!" : "bmp is null!");
-                    pathList.add(saveToInternalStorage(bmp));
+                    images.add(saveToInternalStorage(bmp));
+                    pathList.put(0, images);
+
 
                     counter++;
                     break;
                 case 1:
                     im2.setVisibility(View.VISIBLE);
                     im2.setImageBitmap(bmp);
-                    pathList.add(saveToInternalStorage(bmp));
+                    //pathList.add(1,saveToInternalStorage(bmp));
+                    images.add(saveToInternalStorage(bmp));
+                    pathList.put(1, images);
                     counter++;
 
                     break;
                 case 2:
                     im3.setVisibility(View.VISIBLE);
                     im3.setImageBitmap(bmp);
-
-                    pathList.add(saveToInternalStorage(bmp));
+                    images.add(saveToInternalStorage(bmp));
+                    pathList.put(2, images);
                     counter++;
                     break;
             }
 
+            System.out.println(pathList.size() + "storlek på pathlist");
 
+            /**
+             * Get images from the gallery on the phone, resize them and save them in the pathlist.
+             **/
         } else if (requestCode == RESULT_LOAD_IMAGE && resultCode == this.getActivity().RESULT_OK && null != data && counter <= 2) {
             Uri selectedImage = data.getData();
             Bitmap bitmap;
@@ -312,20 +331,24 @@ public class EditFragment extends Fragment {
                         im1.setVisibility(View.VISIBLE);
                         im1.setImageBitmap(resizedBitmap);
                         Log.d(this.getActivity().getPackageName(), bitmap != null ? "bitmap is not null!" : "bitmap is null!");
-                        pathList.add(saveToInternalStorage(resizedBitmap));
+                        images.add(saveToInternalStorage(resizedBitmap));
+                        pathList.put(0, images);
 
                         counter++;
                         break;
                     case 1:
                         im2.setVisibility(View.VISIBLE);
                         im2.setImageBitmap(resizedBitmap);
-                        pathList.add(saveToInternalStorage(resizedBitmap));
+                        images.add(saveToInternalStorage(resizedBitmap));
+                        pathList.put(1, images);
                         counter++;
                         break;
                     case 2:
                         im3.setVisibility(View.VISIBLE);
                         im3.setImageBitmap(resizedBitmap);
-                        pathList.add(saveToInternalStorage(resizedBitmap));
+                        //pathList.add(saveToInternalStorage(resizedBitmap));
+                        images.add(saveToInternalStorage(resizedBitmap));
+                        pathList.put(2, images);
                         counter++;
                         break;
                 }
@@ -339,7 +362,9 @@ public class EditFragment extends Fragment {
         }
     }
 
-
+    /**
+     *Make the bitmap image inte a string filepath
+     **/
     private String saveToInternalStorage(Bitmap bitmapImage) {
         ContextWrapper cw = new ContextWrapper(this.getActivity().getApplicationContext());
         // path to /data/data/yourapp/app_data/imageDir
@@ -361,7 +386,9 @@ public class EditFragment extends Fragment {
         return directory.getAbsolutePath();
     }
 
-
+    /**
+     *Get the image from the filepath
+     **/
     private Bitmap loadImageFromStorage(String path) {
         Bitmap b = null;
         try {
@@ -374,21 +401,9 @@ public class EditFragment extends Fragment {
         return b;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        SharedPreferences pref = this.getActivity().getSharedPreferences("pathlist", 0);
-        SharedPreferences.Editor editor = pref.edit();
-
-        Set<String> set = new HashSet<String>();
-        for (int i = 0; i < pathList.size(); i++) {
-            set.add(pathList.get(i).toString());
-        }
-        editor.putStringSet("pathlist", set);
-        editor.commit();
-
-    }
-
+    /**
+     *A dialog where a user writes the texts for the post
+     **/
     protected void showInputDialog() {
 
         // get prompts.xml view
@@ -438,6 +453,8 @@ public class EditFragment extends Fragment {
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
     }
+
+
 
 }
 
