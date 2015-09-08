@@ -66,6 +66,7 @@ public class EditFragment extends Fragment {
     private String dateString, capString;
     private String destination;
     private ArrayList<String> images;
+    private ArrayList<String> imageNames;
 
     public static EditFragment newInstance() {
         EditFragment fragment = new EditFragment();
@@ -93,7 +94,6 @@ public class EditFragment extends Fragment {
                              Bundle savedInstanceState) {
         imList = new ArrayList<Bitmap>();
         content = new ContentItem(null, null, null, null, null, null, null, null);
-        pathList = new HashMap<Integer, ArrayList<String>>();
 
         textList = new ArrayList<String>();
         counter = 0;
@@ -102,7 +102,7 @@ public class EditFragment extends Fragment {
         capString = null;
         destination = getArguments().getString("destination");
         images = new ArrayList<String>();
-
+        imageNames = new ArrayList<String>();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.edit_fragment, container, false);
 
@@ -149,6 +149,8 @@ public class EditFragment extends Fragment {
          *Go back to placeviewfragment and showing all post.
          * Sends a contentitem back to the addnewcontent methos in placeviewfragment
          **/
+
+//        System.out.println("Imagenames: "+ imageNames.get(0));
         save = (Button) view.findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,16 +166,16 @@ public class EditFragment extends Fragment {
                 String t1 = null, t2 = null, t3 = null;
                 String b1 = null, b2 = null, b3 = null;
 
-                if (!pathList.isEmpty()) {
+                if (!images.isEmpty()) {
                     if (images.size() < 2) {
-                        b1 = pathList.get(0).get(0);
+                        b1 = images.get(0);
                     } else if (images.size() < 3) {
-                        b1 =pathList.get(0).get(0);
-                        b2 =pathList.get(0).get(1);
+                        b1 =images.get(0);
+                        b2 =images.get(1);
                     } else if (images.size() > 2) {
-                        b1 = pathList.get(0).get(0);
-                        b2 = pathList.get(0).get(1);
-                        b3 = pathList.get(0).get(2);
+                        b1 = images.get(0);
+                        b2 = images.get(1);
+                        b3 = images.get(2);
                     }
                     if (textList.size() == 1) {
                         t1 = textList.get(0);
@@ -258,7 +260,7 @@ public class EditFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         /**
-         *Gets the images taken with the camera, and depended on how many pictures were taken they are saved in pathlist
+         *Gets the images taken with the camera, depended on how many pictures were taken, they are saved in images.
          **/
         if (requestCode == CAMERA_REQUEST && resultCode == this.getActivity().RESULT_OK && counter <= 2) {
             Bitmap bmp = (Bitmap) data.getExtras().get("data");
@@ -270,7 +272,7 @@ public class EditFragment extends Fragment {
                     im1.setImageBitmap(bmp);
                     Log.d(this.getActivity().getPackageName(), bmp != null ? "bmp is not null!" : "bmp is null!");
                     images.add(saveToInternalStorage(bmp));
-                    pathList.put(0, images);
+
 
 
                     counter++;
@@ -280,7 +282,7 @@ public class EditFragment extends Fragment {
                     im2.setImageBitmap(bmp);
                     //pathList.add(1,saveToInternalStorage(bmp));
                     images.add(saveToInternalStorage(bmp));
-                    pathList.put(1, images);
+
                     counter++;
 
                     break;
@@ -288,12 +290,12 @@ public class EditFragment extends Fragment {
                     im3.setVisibility(View.VISIBLE);
                     im3.setImageBitmap(bmp);
                     images.add(saveToInternalStorage(bmp));
-                    pathList.put(2, images);
+
                     counter++;
                     break;
             }
 
-            System.out.println(pathList.size() + "storlek på pathlist");
+
 
             /**
              * Get images from the gallery on the phone, resize them and save them in the pathlist.
@@ -332,7 +334,7 @@ public class EditFragment extends Fragment {
                         im1.setImageBitmap(resizedBitmap);
                         Log.d(this.getActivity().getPackageName(), bitmap != null ? "bitmap is not null!" : "bitmap is null!");
                         images.add(saveToInternalStorage(resizedBitmap));
-                        pathList.put(0, images);
+
 
                         counter++;
                         break;
@@ -340,15 +342,14 @@ public class EditFragment extends Fragment {
                         im2.setVisibility(View.VISIBLE);
                         im2.setImageBitmap(resizedBitmap);
                         images.add(saveToInternalStorage(resizedBitmap));
-                        pathList.put(1, images);
+
                         counter++;
                         break;
                     case 2:
                         im3.setVisibility(View.VISIBLE);
                         im3.setImageBitmap(resizedBitmap);
-                        //pathList.add(saveToInternalStorage(resizedBitmap));
                         images.add(saveToInternalStorage(resizedBitmap));
-                        pathList.put(2, images);
+
                         counter++;
                         break;
                 }
@@ -363,15 +364,22 @@ public class EditFragment extends Fragment {
     }
 
     /**
-     *Make the bitmap image inte a string filepath
+     *Make the bitmap image into a string filepath
      **/
     private String saveToInternalStorage(Bitmap bitmapImage) {
         ContextWrapper cw = new ContextWrapper(this.getActivity().getApplicationContext());
         // path to /data/data/yourapp/app_data/imageDir
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
         // Create imageDir
-        File mypath = new File(directory, "image.jpg");
+        File mypath = null;
+        try {
+            mypath = File.createTempFile("image", ".jpg", directory);
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        imageNames.add(mypath.getName());
+        //System.out.println("Imagenames " + imageNames.get(0) + " sholud be same as:  "+ mypath.getName());
         FileOutputStream fos = null;
         try {
 
@@ -383,23 +391,11 @@ public class EditFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return directory.getAbsolutePath();
+        System.out.println("abs file: "+mypath.getAbsolutePath());
+
+        return mypath.getAbsolutePath();
     }
 
-    /**
-     *Get the image from the filepath
-     **/
-    private Bitmap loadImageFromStorage(String path) {
-        Bitmap b = null;
-        try {
-            File f = new File(path, "image.jpg");
-            b = BitmapFactory.decodeStream(new FileInputStream(f));
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return b;
-    }
 
     /**
      *A dialog where a user writes the texts for the post

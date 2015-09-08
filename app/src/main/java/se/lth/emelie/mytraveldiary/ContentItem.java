@@ -14,14 +14,16 @@ import java.util.List;
 public class ContentItem {
     private String date, caption, text1, text2, text3;
     private String im1, im2, im3;
-    private ArrayList<String> imageList;
+    private ArrayList<String> imageList, imageNames;
     private ArrayList<String> textList;
+
 
     public ContentItem(String date, String caption, String text1, String text2, String text3, String im1, String im2, String im3) {
         this.date = date;
         this.caption = caption;
         imageList = new ArrayList<String>(3);
         textList = new ArrayList<String>(3);
+        //this.imageNames = imageNames;
         this.text1 = text1;
         this.text2 = text2;
         this.text3 = text3;
@@ -54,31 +56,10 @@ public class ContentItem {
         return imageList;
 
     }
-
-    public void setImage1(String image1) {
-        imageList.add(0, image1);
-    }
-
-    public void setImage2(String image2) {
-        imageList.add(1, image2);
-    }
-
-    public void setImage3(String image3) {
-        imageList.add(2, image3);
-    }
-
-    public void setText1(String text1) {
-        textList.add(0, text1);
+/*
+    public ArrayList<String> getImageNames() {
+        return imageNames;
 
     }
-
-    public void setText2(String text2) {
-        textList.add(1, text2);
-
-    }
-
-    public void setText3(String text3) {
-        textList.add(2, text3);
-
-    }
+*/
 }

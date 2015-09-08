@@ -51,15 +51,6 @@ import java.util.Set;
 
 public class PlaceViewFragment extends Fragment {
 
-    /**
-     * Att GÖRA!!:
-     * Spara inlägg, dvs spara alla bilder och text till varje inlägg.
-     * Kunna ladda in alla inlägg med rätt bilder och text.
-     * Fixa så att vid fler bilder än en i ett inlägg så ska inte bara den sista tilllagda bilden visas flera gånger.
-     * Fixa så man kan fylla i datum och caption.
-     * Fixa små buggar, text vad som händer om man inte fyllt i nån text mm...
-     * Ev fixa popupp rutor, tex vid edit mode om man inte fyllt i nått.
-     **/
 
 
     private OnFragmentInteractionListener mListener;

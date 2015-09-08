@@ -3,6 +3,7 @@ package se.lth.emelie.mytraveldiary;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -98,13 +100,18 @@ public class MyAdapter extends BaseAdapter {
             holder.tt3.setVisibility(View.VISIBLE);
         }
 
-        if (p.getImages().size() > 0) {
+        System.out.println("size "+p.getImages().size());
+        if (p.getImages().get(0) != null) {
+            System.out.println("image 1 "+p.getImages().get(0));
             holder.im1.setImageBitmap(loadImageFromStorage(p.getImages().get(0)));
             holder.im1.setVisibility(View.VISIBLE);
+        } if (p.getImages().get(1) != null) {
 
+            System.out.println("image 2 "+p.getImages().get(1));
             holder.im2.setImageBitmap(loadImageFromStorage(p.getImages().get(1)));
             holder.im2.setVisibility(View.VISIBLE);
-
+        } if (p.getImages().get(2) != null) {
+            System.out.println("image 3 "+p.getImages().get(2));
             holder.im3.setImageBitmap(loadImageFromStorage(p.getImages().get(2)));
             holder.im3.setVisibility(View.VISIBLE);
         }
@@ -120,14 +127,18 @@ public class MyAdapter extends BaseAdapter {
 
     private Bitmap loadImageFromStorage(String path) {
         Bitmap b = null;
+        System.out.println("path:  "+path);
+       // Log.d("The Path...", path);
+
+        /*File f =  new File(path);
         try {
-            File f = new File(path, "image.jpg");
             b = BitmapFactory.decodeStream(new FileInputStream(f));
-
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
+        b = BitmapFactory.decodeFile(path);
+
+       // Log.d("Bitmap image " ,b.toString());
         return b;
     }
 

@@ -17,7 +17,7 @@ import android.view.MenuItem;
 
 
 public class MainActivity extends AppCompatActivity implements ItemFragment.OnFragmentInteractionListener, PlaceViewFragment.OnFragmentInteractionListener, EditFragment.OnFragmentInteractionListener {
-    private String[] navMenuTitles;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
