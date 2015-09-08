@@ -264,14 +264,32 @@ public class EditFragment extends Fragment {
          **/
         if (requestCode == CAMERA_REQUEST && resultCode == this.getActivity().RESULT_OK && counter <= 2) {
             Bitmap bmp = (Bitmap) data.getExtras().get("data");
+            int width = bmp.getWidth();
+            int height = bmp.getHeight();
+            int newWidth = 700;
+            int newHeight = 700;
 
+            // calculate the scale - in this case = 0.4f
+            float scaleWidth = ((float) newWidth) / width;
+            float scaleHeight = ((float) newHeight) / height;
+
+            // create a matrix for the manipulation
+            Matrix matrix = new Matrix();
+            // resize the bit map
+            matrix.postScale(scaleWidth, scaleHeight);
+            // rotate the Bitmap
+
+
+            // recreate the new Bitmap
+            Bitmap resizedBmp = Bitmap.createBitmap(bmp, 0, 0,
+                    width, height, matrix, true);
 
             switch (counter) {
                 case 0:
                     im1.setVisibility(View.VISIBLE);
-                    im1.setImageBitmap(bmp);
+                    im1.setImageBitmap(resizedBmp);
                     Log.d(this.getActivity().getPackageName(), bmp != null ? "bmp is not null!" : "bmp is null!");
-                    images.add(saveToInternalStorage(bmp));
+                    images.add(saveToInternalStorage(resizedBmp));
 
 
 
@@ -279,17 +297,17 @@ public class EditFragment extends Fragment {
                     break;
                 case 1:
                     im2.setVisibility(View.VISIBLE);
-                    im2.setImageBitmap(bmp);
+                    im2.setImageBitmap(resizedBmp);
                     //pathList.add(1,saveToInternalStorage(bmp));
-                    images.add(saveToInternalStorage(bmp));
+                    images.add(saveToInternalStorage(resizedBmp));
 
                     counter++;
 
                     break;
                 case 2:
                     im3.setVisibility(View.VISIBLE);
-                    im3.setImageBitmap(bmp);
-                    images.add(saveToInternalStorage(bmp));
+                    im3.setImageBitmap(resizedBmp);
+                    images.add(saveToInternalStorage(resizedBmp));
 
                     counter++;
                     break;
@@ -310,8 +328,8 @@ public class EditFragment extends Fragment {
 
                 int width = bitmap.getWidth();
                 int height = bitmap.getHeight();
-                int newWidth = 1000;
-                int newHeight = 1000;
+                int newWidth = 700;
+                int newHeight = 700;
 
                 // calculate the scale - in this case = 0.4f
                 float scaleWidth = ((float) newWidth) / width;

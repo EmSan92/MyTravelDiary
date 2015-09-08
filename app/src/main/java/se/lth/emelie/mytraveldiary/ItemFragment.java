@@ -262,7 +262,7 @@ public class ItemFragment extends Fragment {
     /**
      *Decide in which direction the swipe occured.
      **/
-    @Override
+   /* @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
@@ -276,7 +276,7 @@ public class ItemFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
 
     @Override

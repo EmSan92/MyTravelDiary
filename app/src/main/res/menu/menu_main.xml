@@ -4,16 +4,5 @@
 
 
 
-    <item
-        android:id="@+id/action_left"
-        android:orderInCategory="100"
-        android:title="Left"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_right"
-        android:orderInCategory="100"
-        android:title="Right"
-        app:showAsAction="never" />
 
 </menu>
