@@ -87,30 +87,33 @@ public class MyAdapter extends BaseAdapter {
         holder.date.setText(p.getDate());
         holder.cap.setText(p.getCaption());
 
-        if (p.getTexts().size() > 0) {
+        System.out.println("textlist size " + p.getTexts().size());
+        for(String s:p.getTexts()){
+            System.out.println("textlist innehåll: "+s);
+        }
+
+        if (p.getTexts().size() > 0 && p.getTexts().get(0) != null) {
             holder.tt1.setText(p.getTexts().get(0));
             holder.tt1.setVisibility(View.VISIBLE);
-
-
+        }if (p.getTexts().size() > 1 && p.getTexts().get(1) != null) {
             holder.tt2.setText(p.getTexts().get(1));
             holder.tt2.setVisibility(View.VISIBLE);
-
-
+        }if (p.getTexts().size() > 2 && p.getTexts().get(2) != null) {
             holder.tt3.setText(p.getTexts().get(2));
             holder.tt3.setVisibility(View.VISIBLE);
         }
 
         System.out.println("size "+p.getImages().size());
-        if (p.getImages().get(0) != null) {
+        if (!p.getImages().isEmpty() && p.getImages().get(0) != null) {
             System.out.println("image 1 "+p.getImages().get(0));
             holder.im1.setImageBitmap(loadImageFromStorage(p.getImages().get(0)));
             holder.im1.setVisibility(View.VISIBLE);
-        } if (p.getImages().get(1) != null) {
+        } if (p.getImages().size() > 1 && p.getImages().get(1) != null) {
 
             System.out.println("image 2 "+p.getImages().get(1));
             holder.im2.setImageBitmap(loadImageFromStorage(p.getImages().get(1)));
             holder.im2.setVisibility(View.VISIBLE);
-        } if (p.getImages().get(2) != null) {
+        } if (p.getImages().size() > 2 && p.getImages().get(2) != null) {
             System.out.println("image 3 "+p.getImages().get(2));
             holder.im3.setImageBitmap(loadImageFromStorage(p.getImages().get(2)));
             holder.im3.setVisibility(View.VISIBLE);

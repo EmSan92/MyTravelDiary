@@ -93,7 +93,7 @@ public class EditFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         imList = new ArrayList<Bitmap>();
-        content = new ContentItem(null, null, null, null, null, null, null, null);
+        content = new ContentItem(null, null, null, null);
 
         textList = new ArrayList<String>();
         counter = 0;
@@ -135,16 +135,6 @@ public class EditFragment extends Fragment {
             }
         });
 
-       /* SharedPreferences pref = this.getActivity().getSharedPreferences("pathlist", 0);
-        SharedPreferences.Editor editor = pref.edit();
-
-        Set<String> set = new HashSet<String>();
-        for (int i = 0; i < pathList.size(); i++) {
-            set.add(pathList.get(i).toString());
-        }
-        editor.putStringSet("pathlist", set);
-        editor.commit();
-*/
         /**
          *Go back to placeviewfragment and showing all post.
          * Sends a contentitem back to the addnewcontent methos in placeviewfragment
@@ -153,42 +143,16 @@ public class EditFragment extends Fragment {
 //        System.out.println("Imagenames: "+ imageNames.get(0));
         save = (Button) view.findViewById(R.id.save);
         save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //final FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-                //ft.replace(R.id.fragmentContainer, placeViewFragment, "NewFragmentTag");
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.replace(R.id.fragmentContainer, placeViewFragment, "tag");
-                fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                                    @Override
+                                    public void onClick(View v) {
+                                        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                                        fragmentTransaction.addToBackStack(null);
+                                        fragmentTransaction.replace(R.id.fragmentContainer, placeViewFragment, "tag");
+                                        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
 
-                String t1 = null, t2 = null, t3 = null;
-                String b1 = null, b2 = null, b3 = null;
+                    placeViewFragment.addNewContent(new ContentItem("Date", "Caption", textList, images));
 
-                if (!images.isEmpty()) {
-                    if (images.size() < 2) {
-                        b1 = images.get(0);
-                    } else if (images.size() < 3) {
-                        b1 =images.get(0);
-                        b2 =images.get(1);
-                    } else if (images.size() > 2) {
-                        b1 = images.get(0);
-                        b2 = images.get(1);
-                        b3 = images.get(2);
-                    }
-                    if (textList.size() == 1) {
-                        t1 = textList.get(0);
-                    } else if (textList.size() == 2) {
-                        t1 = textList.get(0);
-                        t2 = textList.get(1);
-                    } else if (textList.size() == 3) {
-                        t1 = textList.get(0);
-                        t2 = textList.get(1);
-                        t3 = textList.get(2);
-                    }
-                    placeViewFragment.addNewContent(new ContentItem("Date", "Caption", t1, t2, t3, b1, b2, b3));
-                }
 
 
                 //placeViewFragment.addNewContent(content);
@@ -288,11 +252,8 @@ public class EditFragment extends Fragment {
                 case 0:
                     im1.setVisibility(View.VISIBLE);
                     im1.setImageBitmap(resizedBmp);
-                    Log.d(this.getActivity().getPackageName(), bmp != null ? "bmp is not null!" : "bmp is null!");
+                   // Log.d(this.getActivity().getPackageName(), bmp != null ? "bmp is not null!" : "bmp is null!");
                     images.add(saveToInternalStorage(resizedBmp));
-
-
-
                     counter++;
                     break;
                 case 1:

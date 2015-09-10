@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements ItemFragment.OnFr
     public void onBackPressed() {
         if (getFragmentManager().getBackStackEntryCount() > 0 ){
             getFragmentManager().popBackStack();
-        } else {
+        }else {
             super.onBackPressed();
         }
     }

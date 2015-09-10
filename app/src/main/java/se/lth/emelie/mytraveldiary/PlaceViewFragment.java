@@ -89,34 +89,7 @@ public class PlaceViewFragment extends Fragment {
 
         desination = getArguments().getString("destination");
 
-        /**
-         *Load contentItems using Json.
-         **/
-        SharedPreferences prefs = activity.getSharedPreferences(desination, 0);
-/*
-        SharedPreferences.Editor prefsEditor = prefs.edit();
-        prefsEditor.clear();
-        prefsEditor.commit();
-*/
-
-        Gson gson = new Gson();
-        String json = prefs.getString(desination, null);
-
-        Map<String, ?> keys = prefs.getAll();
-
-        for (Map.Entry<String, ?> entry : keys.entrySet()) {
-            Log.d("map values", entry.getKey() + ": " +
-                    entry.getValue().toString());
-        }
-
-        Type type = new TypeToken<ArrayList<ContentItem>>() {
-        }.getType();
-        contentList = gson.fromJson(json, type);
-        // Log.d("Contentlist 1", contentList.get(0).getImages().get(0).toString());
-        if (contentList == null) {
-            contentList = new ArrayList<ContentItem>();
-        }
-
+        loadInfo();
 
         listView = (ListView) view.findViewById(R.id.listView2);
 
@@ -248,6 +221,31 @@ public class PlaceViewFragment extends Fragment {
         prefsEditor.commit();
 
     }
+
+    private void loadInfo(){
+        /**
+         *Load contentItems using Json.
+         **/
+        SharedPreferences prefs = activity.getSharedPreferences(desination, 0);
+        Gson gson = new Gson();
+        String json = prefs.getString(desination, null);
+        Map<String, ?> keys = prefs.getAll();
+
+        for (Map.Entry<String, ?> entry : keys.entrySet()) {
+            Log.d("map values", entry.getKey() + ": " +
+                    entry.getValue().toString());
+        }
+
+        Type type = new TypeToken<ArrayList<ContentItem>>() {
+        }.getType();
+        contentList = gson.fromJson(json, type);
+        // Log.d("Contentlist 1", contentList.get(0).getImages().get(0).toString());
+        if (contentList == null) {
+            contentList = new ArrayList<ContentItem>();
+        }
+    }
+
+
 
 
 }

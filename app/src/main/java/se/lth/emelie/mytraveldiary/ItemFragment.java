@@ -148,7 +148,6 @@ public class ItemFragment extends Fragment {
         myListView.setAdapter(mAdapter);
 
 
-        // step 1. create a MenuCreator
         SwipeMenuCreator creator = new SwipeMenuCreator() {
 
             /**
@@ -157,21 +156,15 @@ public class ItemFragment extends Fragment {
             @Override
             public void create(SwipeMenu menu) {
 
-                // create "delete" item
                 SwipeMenuItem deleteItem = new SwipeMenuItem(
                         activity.getApplicationContext());
-                // set item background
                 deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
                         0x3F, 0x25)));
-                // set item width
                 deleteItem.setWidth(dp2px(90));
-                // set a icon
                 deleteItem.setIcon(android.R.drawable.ic_menu_delete);
-                // add to menu
                 menu.addMenuItem(deleteItem);
             }
         };
-        // set creator
         myListView.setMenuCreator(creator);
 
         /**
@@ -258,25 +251,7 @@ public class ItemFragment extends Fragment {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getResources().getDisplayMetrics());
     }
-
-    /**
-     *Decide in which direction the swipe occured.
-     **/
-   /* @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_left) {
-            myListView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
-            return true;
-        }
-        if (id == R.id.action_right) {
-            myListView.setSwipeDirection(SwipeMenuListView.DIRECTION_RIGHT);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
+    
 
 
     @Override
