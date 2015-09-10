@@ -158,8 +158,8 @@ public class ItemFragment extends Fragment {
 
                 SwipeMenuItem deleteItem = new SwipeMenuItem(
                         activity.getApplicationContext());
-                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
-                        0x3F, 0x25)));
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0x0,
+                        0x0, 0x0)));
                 deleteItem.setWidth(dp2px(90));
                 deleteItem.setIcon(android.R.drawable.ic_menu_delete);
                 menu.addMenuItem(deleteItem);

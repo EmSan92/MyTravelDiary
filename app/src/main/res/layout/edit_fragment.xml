@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="se.lth.emelie.mytraveldiary.EditFragment"
     android:id="@+id/fragmentedit"
-    android:background="@drawable/back">
+    android:background="@drawable/back5">
 <ScrollView
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -96,7 +96,7 @@
         android:orientation="horizontal"
         android:layout_gravity="bottom|center"
         android:padding="10dp"
-        android:background="#668999">
+        android:background="#EF5350">
         <View
             android:layout_width="0dp"
             android:layout_height="1dp"
