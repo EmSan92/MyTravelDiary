@@ -36,7 +36,8 @@
             android:layout_height="0dp"
             android:layout_gravity="bottom"
             android:layout_weight="1"
-            android:background="@drawable/skylineblack"
+            android:background="@drawable/skyline"
+            android:layout_alignParentBottom="true"
             android:paddingTop="20dp" />
 
     </LinearLayout>

@@ -33,13 +33,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Calendar.*;
 
 
 public class EditFragment extends Fragment {
@@ -150,8 +154,9 @@ public class EditFragment extends Fragment {
                                         fragmentTransaction.replace(R.id.fragmentContainer, placeViewFragment, "tag");
                                         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
+                    String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
-                    placeViewFragment.addNewContent(new ContentItem("Date", "Caption", textList, images));
+                    placeViewFragment.addNewContent(new ContentItem(date, "Caption", textList, images));
 
 
 
